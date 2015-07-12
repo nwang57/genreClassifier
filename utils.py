@@ -4,10 +4,13 @@ import timeit
 import numpy as np
 import sunau
 import wave
+import scipy
+import scipy.io.wavfile
 import matplotlib.pyplot as plt
 
 
 DATA_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/data/"
+TEST_FILE = "/home/nick/Desktop/zone/python_fun/projects/genre/data/blues/blues.00099.wav"
 
 def au2wav(in_file, out_file):
     au = sunau.open(in_file, 'r')
@@ -45,11 +48,17 @@ def convert_dataset_to_wav():
     stop = timeit.default_timer()
     print("Conversion time = ", (stop - start))
 
+def plot_time_domain(file):
+    rate, X = scipy.io.wavfile.read(file)
+    seg = X[220500:264600]
+    timp = len(seg) / float(rate)
+    t = np.linspace(0,timp,len(seg))
+    plt.plot(t,seg)
+    plt.xlabel('Time')
+    plt.ylabel('Amplitude')
+    plt.savefig(os.path.join('.', "confusion_matrix.png"), bbox_inches="tight")
+
+
 if __name__ == "__main__":
     #convert_dataset_to_wav()
-    a=np.array([1,4,5])
-    plt.plot(a)
-    plt.ylabel('some numbers')
-    plt.show()
-    #plt.savefig(os.path.join('.', "confusion_matrix.png"), bbox_inches="tight")
-
+    plot_time_domain(TEST_FILE)
