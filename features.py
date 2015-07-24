@@ -1,11 +1,12 @@
 import os
 import sys
+import glob
 import numpy as np
 import scipy
 
 from scipy.fftpack import fft
 
-from utils import DATA_DIR
+from utils import DATA_DIR, FT_DIR, GENRE_DICT
 from utils import show_feature, load_source, stft, plot_stft
 
 #For example, a measurement with a high zero-crossing rate, i.e., the number of samples per second that cross the zero reference line, indicates that it is noisy.
@@ -106,23 +107,79 @@ def spectral_flux(wavedata, window_size, sample_rate):
 
     return sf[1:], np.asarray(timestamps)
 
+def write_features(feature, fn):
+    np.save(fn, feature)
+    print("Written : ", fn)
+
+
+def compute_features(source, features):
+    """
+        compute features for all the tracks
+    """
+    for label in source.keys():
+        for i in range(0,100):
+            base_path = os.path.join(FT_DIR, "%s_%d" % (label, i))
+            if 'zcr' in features:
+                zcr, ts = zero_crossing_rate(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
+                source[label][i]['zcr'] = zcr
+
+            if 'rms' in features:
+                rms, ts = root_mean_square(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
+                source[label][i]['rms'] = rms
+
+            if 'sc' in features:
+                sc, ts = spectual_centroid(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
+                source[label][i]['sc'] = sc
+
+            if 'sr' in features:
+                sr, ts = spectral_rolloff(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
+                source[label][i]['sr'] = sr
+
+            if 'sf' in features:
+                sf, ts = spectral_flux(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
+                source[label][i]['sf'] = sf
+
+            write_features([source[label][i][ft] for ft in features], base_path)
+
+
+
+def read_features(features):
+    """
+        read all the features in the 'features' array and return a numpy array
+    """
+    X = []
+    y = []
+    for fn in glob.glob(os.path.join(FT_DIR, "*.npy")):
+        start = fn.rfind('/')
+        end = fn.rfind('.')
+        ext = fn[start+1:end]
+        genre, _= ext.split('_')
+        data = np.load(fn)
+        X.append([np.mean(ft) for ft in data] + [np.std(ft) for ft in data])
+        y.append(GENRE_DICT[genre])
+
+    return np.array(X), np.array(y)
+
+def create_features(features):
+    import timeit
+    source = load_source()
+    start = timeit.default_timer()
+    compute_features(source, features)
+    end = timeit.default_timer()
+    print("save all features takes ", (end-start))
+
+
+
+
+
 if __name__ == "__main__":
-    source = load_source("blues")
+    features = ['zcr', 'rms', 'sc', 'sr', 'sf']
 
-    # zcr, ts = zero_crossing_rate(source['blues'][99]['wavedata'], 512, source['blues'][99]['sample_rate'])
-    # source['blues'][99]['zcr'] = zcr
+    #create_features(features) #will write all the features to the 'feature' directory
 
-    # rms, ts = root_mean_square(source['blues'][99]['wavedata'], 512, source['blues'][99]['sample_rate'])
-    # source['blues'][99]['rms'] = rms
+    X, y = read_features(features)
+    print(X.shape, " : ",y.shape)
 
-    # sc, ts = spectual_centroid(source['blues'][99]['wavedata'], 512, source['blues'][99]['sample_rate'])
-    # source['blues'][99]['sc'] = sc
-
-    # sr, ts = spectral_rolloff(source['blues'][99]['wavedata'], 512, source['blues'][99]['sample_rate'])
-    # source['blues'][99]['sr'] = sr
-
-    sf, ts = spectral_flux(source['blues'][99]['wavedata'], 512, source['blues'][99]['sample_rate'])
-    source['blues'][99]['sf'] = sf
-    show_feature(source['blues'][99], "sf", ts, "blue_512_sf")
+    #show_feature(source['classical'][99], "zcr", ts, "classical_512_zcr")
     #plot_stft(source['blues'][99]['wavedata'], source['blues'][99]['sample_rate'], 512)
 

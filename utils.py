@@ -13,8 +13,20 @@ from pydub import AudioSegment
 
 
 DATA_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/data/"
+FT_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/feature/"
 TEST_FILE = "/home/nick/Desktop/zone/python_fun/projects/genre/data/blues/blues.00099.au.wav"
-GENRE_LIST = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
+GENRE_DICT = {
+              "blues"     : 1,
+              "classical" : 2,
+              "country"   : 3,
+              "disco"     : 4,
+              "hiphop"    : 5,
+              "jazz"      : 6,
+              "metal"     : 7,
+              "pop"       : 8,
+              "reggae"    : 9,
+              "rock"      : 0
+             }
 
 def convert_dataset_to_wav():
     """
@@ -136,27 +148,31 @@ def load_source(genre = None):
     source = {}
 
     #read the data into source
+    start = timeit.default_timer()
     if genre:
-        if genre in GENRE_LIST:
+        if genre in GENRE_DICT.keys():
             rootdir = DATA_DIR + "%s/" % genre
             source[genre] = []
         else:
             raise ValueError("could not find gengre %s in %r" % (genre, GENRE_LIST))
     else:
         rootdir = DATA_DIR
-        for gen in GENRE_LIST:
+        for gen in GENRE_DICT.keys():
             source[gen] = []
 
     for subdir, dirs, files in os.walk(rootdir):
         for file in files:
             if subdir[-1] == '/':
                 gen = subdir.split('/')[-2]
+                path = subdir + file
             else:
                 gen = subdir.split('/')[-1]
-            path = subdir + file
+                path = subdir + '/' + file
             music = {'name' : file}
             music['sample_rate'], music['wavedata'] = scipy.io.wavfile.read(path)
             source[gen].append(music)
+    end = timeit.default_timer()
+    print("load all music takes ", (end - start))
     return(source)
 
 
