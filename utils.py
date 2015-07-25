@@ -55,6 +55,11 @@ def convert_dataset_to_wav():
     # stop = timeit.default_timer()
     # print("Conversion time = ", (stop - start))
 
+def plot_scores(ks, test_scores, train_scores):
+    plt.plot(ks, test_scores, color='b')
+    plt.plot(ks, train_scores, color='r')
+    plt.savefig(os.path.join('.', "knn_distance.png"), bbox_inches='tight')
+
 def plot_time_domain(file):
     rate, X = scipy.io.wavfile.read(file)
     timp = len(X) / float(rate)
