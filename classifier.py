@@ -4,7 +4,7 @@ from sklearn import cross_validation
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import confusion_matrix
 from features import read_features
-from utils import plot_scores
+from utils import plot_scores, plot_learning_curve
 
 def train_model(X, y, n, w):
     #initialize the clf
@@ -40,10 +40,7 @@ def train_model(X, y, n, w):
 
     return np.mean(test_scores), np.mean(train_scores), np.asarray(cms)
 
-if __name__ == "__main__":
-    features = ['zcr', 'rms', 'sc', 'sr', 'sf']
-    X, y = read_features(features)
-
+def find_best_k(X, y):
     test_scores = []
     train_scores = []
     cm_norms = []
@@ -55,5 +52,16 @@ if __name__ == "__main__":
         cm_norms.append(np.sum(cms, axis=0))
     print("test: ", test_scores)
     plot_scores(ks, test_scores, train_scores)
+
+if __name__ == "__main__":
+    features = ['zcr', 'rms', 'sc', 'sr', 'sf']
+    X, y = read_features(features)
+
+    #plot learning curve for 8nn
+    # knn_clf = KNeighborsClassifier(n_neighbors=8, weights = 'distance')
+    # crossvalidation = cross_validation.StratifiedKFold(y, n_folds=5)
+    # plot_learning_curve(knn_clf, "knn_learning_curve", X, y, cv= crossvalidation, n_jobs=4)
+
+    #find_best_k(X,y)
 
 
