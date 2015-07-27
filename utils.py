@@ -8,14 +8,14 @@ import scipy
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
 
-from sklearn.learning_curve import learning_curve
+#from sklearn.learning_curve import learning_curve
 
 from pydub import AudioSegment
 
 
 
 DATA_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/data/"
-FT_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/feature/"
+FT_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/feature/2048/"
 TEST_FILE = "/home/nick/Desktop/zone/python_fun/projects/genre/data/blues/blues.00099.au.wav"
 GENRE_DICT = {
               "blues"     : 1,

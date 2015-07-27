@@ -51,7 +51,7 @@ def find_best_k(X, y):
         train_scores.append(train_score)
         cm_norms.append(np.sum(cms, axis=0))
     print("test: ", test_scores)
-    print(cm_norms[3])
+    print(cm_norms[4])
     #plot_scores(ks, test_scores, train_scores)
 
 if __name__ == "__main__":

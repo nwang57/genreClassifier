@@ -28,7 +28,7 @@ musical surface features:
 ###2. classification
 
 KNN with 8 nearest neighbors and weights on distance achieves 0.4179 test accuracy (5 fold CV)
-
+window_size = 512 => freq resolution = 22050/512 = 43 Hz
     0  1  2  3  4  5  6  7  8  9
 0 [27  0  0  5 15  3  7 17 14 12]
 1 [ 0 73  1 19  2  3  1  1  0  0]
@@ -54,3 +54,18 @@ KNN with 8 nearest neighbors and weights on distance achieves 0.4179 test accura
 
 
 metal, pop , rock and reggae mess up together
+
+window_size = 2048 => freq resolution = 10.7 Hz
+k = 16
+accuracy = 0.437
+[[48  1  0  7  3  2 13 11  5 10]
+ [ 0 72  2 17  4  5  0  0  0  0]
+ [ 0  3 88  9  0  0  0  0  0  0]
+ [19 17  3 39  6  0  6  3  2  5]
+ [11  8  0  4 27  3  7  9 17 14]
+ [14 18  1  5 10 40  1  2  4  5]
+ [25  4  8  8  2  1 20  6  6 20]
+ [21  3  0  1  8  0  1 18 37 11]
+ [ 3  0  0  2 11  0  4 21 45 14]
+ [ 5  0  0  0  5  0 10 18 22 40]]
+

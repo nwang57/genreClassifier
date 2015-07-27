@@ -5,6 +5,7 @@ import numpy as np
 import scipy
 
 from scipy.fftpack import fft
+from scikits.talkbox.features import mfcc
 
 from utils import DATA_DIR, FT_DIR, GENRE_DICT
 from utils import show_feature, load_source, stft, plot_stft
@@ -50,7 +51,7 @@ def root_mean_square(wavedata, window_size, sample_rate):
 #
 #center of gravity (balancing point of the spectrum)
 #It determines the frequency area around which most of the signal energy concentrates
-#gives an indication of how “dark” or “bright” a sound is
+#gives an indication of how dark or bright a sound is
 
 def spectual_centroid(wavedata, window_size, sample_rate):
     magnitude_spectrum = stft(wavedata, window_size)
@@ -119,35 +120,41 @@ def compute_features(source, features):
     for label in source.keys():
         for i in range(0,100):
             base_path = os.path.join(FT_DIR, "%s_%d" % (label, i))
+            ft = []
             if 'zcr' in features:
                 zcr, ts = zero_crossing_rate(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
-                source[label][i]['zcr'] = zcr
+                ft.append(zcr)
 
             if 'rms' in features:
                 rms, ts = root_mean_square(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
-                source[label][i]['rms'] = rms
+                ft.append(rms)
 
             if 'sc' in features:
-                sc, ts = spectual_centroid(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
-                source[label][i]['sc'] = sc
+                sc, ts = spectual_centroid(source[label][i]['wavedata'], 2048, source[label][i]['sample_rate'])
+                ft.append(sc)
 
             if 'sr' in features:
-                sr, ts = spectral_rolloff(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
-                source[label][i]['sr'] = sr
+                sr, ts = spectral_rolloff(source[label][i]['wavedata'], 2048, source[label][i]['sample_rate'])
+                ft.append(sr)
 
             if 'sf' in features:
-                sf, ts = spectral_flux(source[label][i]['wavedata'], 512, source[label][i]['sample_rate'])
-                source[label][i]['sf'] = sf
+                sf, ts = spectral_flux(source[label][i]['wavedata'], 2048, source[label][i]['sample_rate'])
+                ft.append(sf)
 
-            write_features([source[label][i][ft] for ft in features], base_path)
+            if 'mfcc' in features:
+                ceps, mspec, spec = mfcc(source[label][i]['wavedata'])
+                ft.append(ceps)
+
+            write_features(ft, base_path)
 
 
 
 def read_features(features):
     """
         read all the features in the 'features' array and return a numpy array
+        currently only compute the grand mean and std
     """
-    X = []
+    x = []
     y = []
     for fn in glob.glob(os.path.join(FT_DIR, "*.npy")):
         start = fn.rfind('/')
@@ -155,10 +162,16 @@ def read_features(features):
         ext = fn[start+1:end]
         genre, _= ext.split('_')
         data = np.load(fn)
-        X.append([np.mean(ft) for ft in data] + [np.std(ft) for ft in data])
+        surface_ft = data[:-1] #5 features
+        ft_vec = [np.mean(ft) for ft in surface_ft] + [np.std(ft) for ft in surface_ft]
+
+        ceps = data[-1]#mfcc features
+        cep_len = len(ceps)
+        ft_vec += np.mean(ceps[int(cep_len / 10.):int(cep_len * 9 / 10.)], axis=0).tolist()
+        x.append(ft_vec)
         y.append(GENRE_DICT[genre])
 
-    return np.array(X), np.array(y)
+    return np.array(x), np.array(y)
 
 def create_features(features):
     import timeit
@@ -173,12 +186,12 @@ def create_features(features):
 
 
 if __name__ == "__main__":
-    features = ['zcr', 'rms', 'sc', 'sr', 'sf']
+    features = ['zcr', 'rms', 'sc', 'sr', 'sf', 'mfcc']
 
-    #create_features(features) #will write all the features to the 'feature' directory
+    create_features(features) #will write all the features to the 'feature' directory
 
-    X, y = read_features(features)
-    print(X.shape, " : ",y.shape)
+    # x, y = read_features(features)
+    # print(x.shape, " : ",y.shape)
 
     #show_feature(source['classical'][99], "zcr", ts, "classical_512_zcr")
     #plot_stft(source['blues'][99]['wavedata'], source['blues'][99]['sample_rate'], 512)
