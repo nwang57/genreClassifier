@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 
 from scipy.fftpack import fft
-from scikits.talkbox.features import mfcc
+#from scikits.talkbox.features import mfcc
 
 from utils import DATA_DIR, FT_DIR, GENRE_DICT
 from utils import show_feature, load_source, stft, plot_stft
@@ -41,7 +41,7 @@ def root_mean_square(wavedata, window_size, sample_rate):
 
         start = i * window_size
         end = np.min([(start + window_size - 1), len(wavedata)])
-
+        print(np.mean(wavedata[start:end]))
         rms_seg = np.sqrt(np.mean(wavedata[start:end]**2))
         rms.append(rms_seg)
     return np.asarray(rms), np.asarray(timestamps)

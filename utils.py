@@ -30,6 +30,28 @@ GENRE_DICT = {
               "rock"      : 0
              }
 
+def normalize_features(train, test):
+    """
+        compute mean and range of the training dataset,
+        use this to normalize both train and test dataset
+    """
+    train = np.nan_to_num(train)
+    test = np.nan_to_num(test)
+
+    #set inf to 0
+    train[train >= 1E308] = 0
+    train[train <= -1E308] = 0
+    test[test >= 1E308] = 0
+    test[test <= -1E308] = 0
+
+    mean_vec = np.mean(train, axis=0)
+    range_vec = ( np.max(train, axis=0) - np.min(train, axis=0) )
+
+    post_train = np.true_divide((train - mean_vec), range_vec)
+    post_test = np.true_divide((test - mean_vec), range_vec)
+    return post_train, post_test
+
+
 def convert_dataset_to_wav():
     """
         Converts all files of the GTZAN dataset

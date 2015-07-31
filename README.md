@@ -69,3 +69,18 @@ accuracy = 0.437
  [ 3  0  0  2 11  0  4 21 45 14]
  [ 5  0  0  0  5  0 10 18 22 40]]
 
+
+###Note:
+
+scikits.talkbox only works for python2.X, so need to create a new virtual environment to compute the mfcc features and store them into the .npy file then switch to python3 for classification.
+
+For C: 0.010000, train_score=0.511500, test_score=0.463000
+()
+For C: 1.000000, train_score=0.496750, test_score=0.468000
+()
+For C: 5.000000, train_score=0.496750, test_score=0.460000
+()
+For C: 10.000000, train_score=0.493500, test_score=0.463000
+()
+#after normalized
+For C: 1000000.000000, train_score=0.674500, test_score=0.476000
