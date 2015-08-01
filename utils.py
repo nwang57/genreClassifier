@@ -8,6 +8,8 @@ import scipy
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
 
+from sklearn import preprocessing
+
 #from sklearn.learning_curve import learning_curve
 
 from pydub import AudioSegment
@@ -16,7 +18,7 @@ from pydub import AudioSegment
 
 DATA_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/data/"
 FT_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/feature/2048/"
-TEST_FILE = "/home/nick/Desktop/zone/python_fun/projects/genre/data/blues/blues.00099.au.wav"
+TEST_FILE = "/home/nick/Desktop/zone/python_fun/projects/genre/data/classical/classical.00007.au.wav"
 GENRE_DICT = {
               "blues"     : 1,
               "classical" : 2,
@@ -35,20 +37,17 @@ def normalize_features(train, test):
         compute mean and range of the training dataset,
         use this to normalize both train and test dataset
     """
-    train = np.nan_to_num(train)
-    test = np.nan_to_num(test)
+    imp_nan = preprocessing.Imputer(missing_values='NaN', strategy='mean', axis=0)
+    imp_nan.fit(train)
+    train_nan = imp_nan.transform(train)
+    test_nan = imp_nan.transform(test)
 
-    #set inf to 0
-    train[train >= 1E308] = 0
-    train[train <= -1E308] = 0
-    test[test >= 1E308] = 0
-    test[test <= -1E308] = 0
+    imp_inf = preprocessing.Imputer(missing_values=-np.inf, strategy='mean', axis=0)
+    imp_inf.fit(train_nan)
+    post_train = preprocessing.scale(imp_inf.transform(train_nan))
+    post_test = preprocessing.scale(imp_inf.transform(test_nan))
 
-    mean_vec = np.mean(train, axis=0)
-    range_vec = ( np.max(train, axis=0) - np.min(train, axis=0) )
-
-    post_train = np.true_divide((train - mean_vec), range_vec)
-    post_test = np.true_divide((test - mean_vec), range_vec)
+    #X[~np.isinf(X).any(axis=1)] remove row with inf
     return post_train, post_test
 
 

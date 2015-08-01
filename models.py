@@ -42,6 +42,9 @@ def train_model(X, y, clf):
     return np.mean(test_scores), np.mean(train_scores), np.asarray(cms)
 
 def find_best_k(X, y):
+    """
+    find best k for KNN
+    """
     test_scores = []
     train_scores = []
     cm_norms = []
@@ -57,6 +60,9 @@ def find_best_k(X, y):
     #plot_scores(ks, test_scores, train_scores)
 
 def svm_tuning(X, y):
+    """
+        find best C for linear kernal svm
+    """
     C_range = [1E6, 1E7, 1E8]
     for c in C_range:
         svm = SVC(kernel='linear', C=c)
@@ -65,21 +71,19 @@ def svm_tuning(X, y):
         print()
 
 def rf_tuning(X, y):
-    n_trees = [100, 500]
+    n_trees = [100, 500, 800]
     for n in n_trees:
         rf = RandomForestClassifier(n_estimators=n)
         test_score, train_score, cms = train_model(X, y, rf)
+        print(rf.feature_importances_)
         print("For n_tree: %f, train_score=%f, test_score=%f" % (n, train_score, test_score))
+        print(np.sum(cms, axis = 0))
         print()
 
 
 if __name__ == "__main__":
     features = ['zcr', 'rms', 'sc', 'sr', 'sf','mfcc']
     X, y = read_features(features)
-
-    X = np.nan_to_num(X)
-    X[X >= 1E308] = 0
-    X[X <= -1E308] = 0
 
     #find_best_k(X,y)
     rf_tuning(X, y)

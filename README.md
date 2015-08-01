@@ -84,3 +84,26 @@ For C: 10.000000, train_score=0.493500, test_score=0.463000
 ()
 #after normalized
 For C: 1000000.000000, train_score=0.674500, test_score=0.476000
+
+###Random Forest
+For n_tree: 500.000000, train_score=0.999250, test_score=0.506000
+[[61  0  0  2  3  0 10 10  6  8]
+ [ 0 90  1  6  0  3  0  0  0  0]
+ [ 0  4 92  4  0  0  0  0  0  0]
+ [17 12  1 43  2  2 10  4  4  5]
+ [17  1  0  3 29  4  4 11 20 11]
+ [13  9  1  4  8 49  5  3  4  4]
+ [28  2  6  7  2  2 30  2  3 18]
+ [24  0  0  0  2  0  1 21 44  8]
+ [ 9  0  0  0  7  1  4 22 46 11]
+ [ 5  0  0  1  3  1 10 14 21 45]]
+
+
+TODO
+1. debug nan and inf
+`>>> np.sum(np.isinf(X),axis=0)`
+`array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])`
+`>>> np.sum(np.isnan(X),axis=0)`
+`array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])`
+
+2. derive avg time between spikes

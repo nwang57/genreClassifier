@@ -1,11 +1,12 @@
 import os
 import sys
+import timeit
 import glob
 import numpy as np
 import scipy
 
 from scipy.fftpack import fft
-#from scikits.talkbox.features import mfcc
+from scikits.talkbox.features import mfcc
 
 from utils import DATA_DIR, FT_DIR, GENRE_DICT
 from utils import show_feature, load_source, stft, plot_stft
@@ -41,7 +42,7 @@ def root_mean_square(wavedata, window_size, sample_rate):
 
         start = i * window_size
         end = np.min([(start + window_size - 1), len(wavedata)])
-        print(np.mean(wavedata[start:end]))
+
         rms_seg = np.sqrt(np.mean(wavedata[start:end]**2))
         rms.append(rms_seg)
     return np.asarray(rms), np.asarray(timestamps)
@@ -154,6 +155,7 @@ def read_features(features):
         read all the features in the 'features' array and return a numpy array
         currently only compute the grand mean and std
     """
+    start = timeit.default_timer()
     x = []
     y = []
     for fn in glob.glob(os.path.join(FT_DIR, "*.npy")):
@@ -170,6 +172,9 @@ def read_features(features):
         ft_vec += np.mean(ceps[int(cep_len / 10.):int(cep_len * 9 / 10.)], axis=0).tolist()
         x.append(ft_vec)
         y.append(GENRE_DICT[genre])
+
+    end = timeit.default_timer()
+    print("reading all features takes: ", (end - start))
 
     return np.array(x), np.array(y)
 
