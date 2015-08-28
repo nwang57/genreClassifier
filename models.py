@@ -5,7 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from features import read_features
-from utils import plot_scores, plot_learning_curve, normalize_features
+from utils import plot_scores, plot_learning_curve, normalize_features, clean_data, impute_nan
 
 
 
@@ -24,6 +24,7 @@ def train_model(X, y, clf):
         X_train, y_train = X[train], y[train]
         X_test, y_test = X[test], y[test]
 
+        X_train, X_test = impute_nan(X_train, X_test)
         X_train, X_test = normalize_features(X_train, X_test)
         #print(X_train[0])
 
@@ -84,6 +85,8 @@ def rf_tuning(X, y):
 if __name__ == "__main__":
     features = ['zcr', 'rms', 'sc', 'sr', 'sf','mfcc']
     X, y = read_features(features)
+    # print(X.shape)
+    X = clean_data(X)
 
     #find_best_k(X,y)
     rf_tuning(X, y)

@@ -12,13 +12,12 @@ from sklearn import preprocessing
 
 #from sklearn.learning_curve import learning_curve
 
-from pydub import AudioSegment
 
 
 
-DATA_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/data/"
-FT_DIR = "/home/nick/Desktop/zone/python_fun/projects/genre/feature/2048/"
-TEST_FILE = "/home/nick/Desktop/zone/python_fun/projects/genre/data/classical/classical.00007.au.wav"
+DATA_DIR = "/Users/nickwang/Documents/Programs/python/projects/genre/data/"
+FT_DIR = "/Users/nickwang/Documents/Programs/python/projects/genre/feature/2048/"
+TEST_FILE = "/Users/nickwang/Documents/Programs/python/projects/genre/data/classical/classical.00007.au.wav"
 GENRE_DICT = {
               "blues"     : 1,
               "classical" : 2,
@@ -32,20 +31,34 @@ GENRE_DICT = {
               "rock"      : 0
              }
 
-def normalize_features(train, test):
+def clean_data(X):
     """
-        compute mean and range of the training dataset,
-        use this to normalize both train and test dataset
+        replace the -inf value by the min of the corresponding column
+    """
+    clean = X[~np.isinf(X).any(axis=1)]
+    min_values = np.min(clean, axis=0)
+    for i in range(X.shape[1]):
+        X[:,i][np.isinf(X[:,i])] = min_values[i]
+    return X
+
+def impute_nan(train, test):
+    """
+        replace nan by column mean
     """
     imp_nan = preprocessing.Imputer(missing_values='NaN', strategy='mean', axis=0)
     imp_nan.fit(train)
     train_nan = imp_nan.transform(train)
     test_nan = imp_nan.transform(test)
+    return train_nan, test_nan
 
-    imp_inf = preprocessing.Imputer(missing_values=-np.inf, strategy='mean', axis=0)
-    imp_inf.fit(train_nan)
-    post_train = preprocessing.scale(imp_inf.transform(train_nan))
-    post_test = preprocessing.scale(imp_inf.transform(test_nan))
+def normalize_features(train, test):
+    """
+        compute mean and range of the training dataset,
+        use this to normalize both train and test dataset
+    """
+    scaler = preprocessing.StandardScaler().fit(train)
+    post_train = scaler.transform(train)
+    post_test = scaler.transform(test)
 
     #X[~np.isinf(X).any(axis=1)] remove row with inf
     return post_train, post_test

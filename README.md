@@ -99,6 +99,19 @@ For n_tree: 500.000000, train_score=0.999250, test_score=0.506000
  [ 5  0  0  1  3  1 10 14 21 45]]
 
 
+##Neural Network
+
+need `pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip --user`
+
+input: 23
+hidden: 200
+output: 10
+
+('train score: ', 0.4025)
+('test score: ', 0.325)
+
+
+
 TODO
 1. debug nan and inf
 `>>> np.sum(np.isinf(X),axis=0)`
@@ -107,3 +120,4 @@ TODO
 `array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])`
 
 2. derive avg time between spikes
+
